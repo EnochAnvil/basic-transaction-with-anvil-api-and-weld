@@ -69,11 +69,15 @@ export interface TransactionBuildResult {
 export async function buildTransaction(
   params: BuildTransactionParams,
 ): Promise<TransactionBuildResult> {
-  if (!params.changeAddress) throw new Error("Change address is required");
-  if (!params.utxos || !params.utxos.length)
+  if (!params.changeAddress) {
+    throw new Error("Change address is required");
+  }
+  if (!params.utxos || !params.utxos.length) {
     throw new Error("UTXOs are required");
-  if (!params.outputs || !params.outputs.length)
+  }
+  if (!params.outputs || !params.outputs.length) {
     throw new Error("Outputs are required");
+  }
 
   return callAnvilApi<TransactionBuildResult, BuildTransactionParams>({
     endpoint: "transactions/build",
@@ -93,9 +97,12 @@ export interface TransactionSubmitResult {
 export async function submitTransaction(
   params: SubmitTransactionParams,
 ): Promise<TransactionSubmitResult> {
-  if (!params.transaction) throw new Error("Transaction is required");
-  if (params.signatures && !params.signatures.length)
+  if (!params.transaction) {
+    throw new Error("Transaction is required");
+  }
+  if (params.signatures && !params.signatures.length) {
     throw new Error("Signatures are required");
+  }
 
   return callAnvilApi<TransactionSubmitResult, SubmitTransactionParams>({
     endpoint: "transactions/submit",
