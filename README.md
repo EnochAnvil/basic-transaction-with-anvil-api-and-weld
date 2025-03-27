@@ -1,36 +1,134 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Anvil with Weld - Cardano Transaction App
+
+A modern web application that enables users to connect their Cardano wallets and send ADA to other addresses. Built with Next.js, Anvil API, and Weld wallet integration.
+
+## Architecture Overview
+
+### Technology Stack
+
+- **Next.js 15+**: React framework with App Router for both client and server components
+- **TypeScript**: For type-safe code development
+- **@ada-anvil/weld**: Library for Cardano wallet integration
+- **Tailwind CSS**: For styling components
+- **Anvil API**: Backend service for Cardano blockchain interaction
+
+### Project Structure
+
+```
+src/
+├── app/               # Next.js App Router
+│   ├── api/           # API routes
+│   │   └── transaction/
+│   │       ├── build/    # Transaction building endpoint
+│   │       └── submit/   # Transaction submission endpoint
+│   ├── globals.css    # Global styles
+│   ├── layout.tsx     # Root layout
+│   └── page.tsx       # Main page component
+├── components/        # Reusable UI components
+│   ├── TransactionForm.tsx  # Form for creating transactions
+│   ├── WalletConnector.tsx  # Wallet connection interface
+│   └── WeldProvider.tsx     # Context provider for wallet
+├── hooks/             # Custom React hooks
+│   └── useTransactionSubmission.ts  # Hook for transaction flow
+└── utils/             # Utility functions
+    └── anvil-api.ts   # Anvil API integration
+```
+
+### Data Flow
+
+1. **Wallet Connection**: User connects wallet via the WalletConnector component
+2. **Transaction Creation**: User inputs recipient address and amount in TransactionForm
+3. **API Flow**:
+   - Frontend calls `/api/transaction/build` with wallet UTXOs, address, and transaction details
+   - The transaction is built using Anvil API
+   - User signs the transaction with their wallet
+   - Frontend calls `/api/transaction/submit` to submit the signed transaction
+   - Transaction hash is returned and displayed to the user
+
+## Prerequisites
+
+- Node.js 18+ and npm
+- Anvil API key
+- Cardano wallet extension (Nami, Eternl, Flint, or other compatible wallets)
+
+## Environment Setup
+
+Create a `.env.local` file in the project root with the following variables:
+
+```
+# Anvil API Key (Required)
+ANVIL_API_KEY=your_api_key_here
+NEXT_PUBLIC_NETWORK=preprod
+```
 
 ## Getting Started
 
-First, run the development server:
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Development Guidelines
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Code Quality
 
-## Learn More
+- **ESLint and Prettier**: Run `npm run format:write` before committing changes
+- **TypeScript**: Maintain proper type definitions for all components and functions
 
-To learn more about Next.js, take a look at the following resources:
+### Security Best Practices
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Never expose API keys in client-side code
+- Validate all inputs, both client-side and server-side
+- Use HTTPS for all API requests
+- Implement proper error handling throughout the application
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## API Documentation
 
-## Deploy on Vercel
+### Transaction Building
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**Endpoint**: `/api/transaction/build`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Method**: POST
+
+**Body**:
+
+```json
+{
+  "changeAddress": "addr1...",
+  "utxos": ["tx1...", "tx2..."],
+  "outputs": [
+    {
+      "address": "addr1...",
+      "lovelace": 1000000
+    }
+  ]
+}
+```
+
+### Transaction Submission
+
+**Endpoint**: `/api/transaction/submit`
+
+**Method**: POST
+
+**Body**:
+
+```json
+{
+  "transaction": "serialized_tx_cbor",
+  "signatures": ["signature1", "signature2"]
+}
+```
+
+## License
+
+[MIT](LICENSE)
